@@ -14,27 +14,36 @@ const Home: NextPage = () => {
       {
         column: "",
         dataName: "",
+        colError: false,
+        nameError: false
       }
     ]
   )
-  const [sql, setSql] = useState("INSERT \nINTO tableName \n  (column) \nVALUES \n  ('data_name');");
 
-  let [test, setTest] = useState("blank")
+  const [first, setFirst] = useState("INSERT \nINTO [table]")
+  const [second, setSecond] = useState("\n  ([column])")
+  const [secondItem, setSecondItem] = useState<string[]>([])
+  const [third, setThird] = useState("\nVALUES \n  (['data_name']);")
+  const [thirdItem, setThirdItem] = useState<string[]>([])
 
 
   const onChangeTableName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (/^[0-9a-zA-Z]+$/.test(event.target.value)) {
-      console.log("TableName")
+    if (/^[0-9a-zA-Z-_]+$/.test(event.target.value)) {
       setTableError(false)
+      setFirst("INSERT \nINTO " + event.target.value)
     } else {
-      setTableError(true)
+      if (event.target.value) {
+        setTableError(true)
+      } else {
+        setTableError(false)
+        setFirst("INSERT \nINTO [table]")
+      }
     }
     setTableName(event.target.value)
   }
 
   const onChangeAddCount = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (/^[0-9]+$/.test(event.target.value)) {
-      console.log("AddCount")
       setAddCountError(false)
     } else {
       setAddCountError(true)
@@ -43,6 +52,7 @@ const Home: NextPage = () => {
   }
 
   const onChangeColumn = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+
     columns[index].column = event.target.value
     setColumn([...columns])
   }
@@ -53,9 +63,73 @@ const Home: NextPage = () => {
   }
 
   const addColumn = () => {
-    const addItem = {column: "", dataName: ""}
+    const addItem = {column: "", dataName: "", colError: false, nameError:false}
     setColumn([...columns, addItem])
   }
+
+  const resetAction = () => {
+    setColumn(
+      [
+        {
+          column: "",
+          dataName: "",
+          colError: false,
+          nameError: false
+        }
+      ]
+    )
+    setSecond("\n  ([column])")
+    setSecondItem([])
+    setThird("\nVALUES \n  (['data_name'])")
+    setThirdItem([])
+  }
+
+  useEffect(() => {
+    let tmpSecond: string[] = []
+    let tmpThird: string[] = []
+    columns.map(item => {
+      if (item.column && !item.colError && item.dataName && !item.nameError) {
+        tmpSecond.push(item.column)
+        tmpThird.push(item.dataName)
+      }
+    })
+    setSecondItem(tmpSecond)
+    setThirdItem(tmpThird)
+  }, [columns])
+
+  useEffect(() => {
+    let secondSql = "\n  ("
+    let thirdSql = "\nVALUES\n  ("
+
+    if (secondItem.length > 0 && thirdItem.length > 0) {
+      secondItem.map(item => {
+        secondSql = secondSql + item + "\n  , "
+      })
+      secondSql = secondSql.slice(0, -5) + ")"
+
+      if (Number(addCount) > 1) {
+        for (let i = 1; i <= Number(addCount); i++) {
+          thirdItem.map(item => {
+            thirdSql = thirdSql + "'" + (item + "-" + i) + "', "
+          })
+          thirdSql = thirdSql.slice(0, -2) + ")\n  ,("
+        }
+        thirdSql = thirdSql.slice(0, -2)
+      } else {
+        thirdItem.map(item => {
+          thirdSql = thirdSql + "'" + item + "'\n  , "
+        })
+        thirdSql = thirdSql.slice(0, -5) + ")"
+      }
+    }else {
+      secondSql = secondSql + "[column])"
+      thirdSql = thirdSql + "['data_name'])"
+    }
+
+    setSecond(secondSql)
+    setThird(thirdSql)
+
+  }, [addCount, secondItem, thirdItem])
 
   return (
     <div css={homeMount}>
@@ -76,7 +150,10 @@ const Home: NextPage = () => {
           </div>
 
           <div css={bottomFormArea}>
-            <button onClick={addColumn}>カラム追加</button>
+            <div css={buttonBox}>
+              <button onClick={addColumn}>カラム追加</button>
+              <button onClick={resetAction}>カラムリセット</button>
+            </div>
             <div css={bottomFormItemLabel}>
               <p>カラム名</p>
               <p>データ名</p>
@@ -89,10 +166,10 @@ const Home: NextPage = () => {
                       <p>{index + 1}</p>
                       <div css={bottomFormItemInner}>
                         <div>
-                          <input type="text" value={item.column} onChange={e => onChangeColumn(e, index)} />
+                          <input type="text" value={item.column} onChange={e => onChangeColumn(e, index)} autoComplete="off" />
                         </div>
                         <div>
-                          <input type="text" value={item.dataName} onChange={e => onChangeDataName(e, index)} />
+                          <input type="text" value={item.dataName} onChange={e => onChangeDataName(e, index)} autoComplete="off" />
                         </div>
                       </div>
                     </div>
@@ -105,7 +182,7 @@ const Home: NextPage = () => {
 
         <div css={exportArea}>
           <label htmlFor='exportArea'><span css={css`display: inline-block; line-height: 1.8rem;`}>SQL文</span></label>
-          <textarea id='exportArea' css={css`width: 100%;`} readOnly value={sql}>
+          <textarea id='exportArea' css={css`width: 100%;`} readOnly value={first + second + third}>
             
           </textarea>
         </div>
@@ -125,6 +202,7 @@ const homeMount = css`
 const container = css`
   display: flex;
   flex-direction: row;
+  min-width: 640px;
   min-height: 100vh;
   padding: 50px 0;
 `
@@ -154,6 +232,17 @@ const topFormItem = css`
 const bottomFormArea = css`
   display: flex;
   flex-direction: column;
+`
+
+const buttonBox = css`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+  button {
+    padding: 5px;
+    border: 2px solid #333333;
+  }
 `
 
 const bottomFormItemLabel = css`
