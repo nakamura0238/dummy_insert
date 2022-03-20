@@ -13,9 +13,9 @@ const Home: NextPage = () => {
     [
       {
         column: "",
-        dataName: "",
+        data: "",
         colError: false,
-        nameError: false
+        dataError: false
       }
     ]
   )
@@ -23,7 +23,7 @@ const Home: NextPage = () => {
   const [first, setFirst] = useState("INSERT \nINTO [table]")
   const [second, setSecond] = useState("\n  ([column])")
   const [secondItem, setSecondItem] = useState<string[]>([])
-  const [third, setThird] = useState("\nVALUES \n  (['data_name']);")
+  const [third, setThird] = useState("\nVALUES \n  (['data']);")
   const [thirdItem, setThirdItem] = useState<string[]>([])
 
 
@@ -52,18 +52,27 @@ const Home: NextPage = () => {
   }
 
   const onChangeColumn = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
-
+    if (/^[0-9a-zA-Z-_]+$/.test(event.target.value)) {
+      columns[index].colError = false
+    } else {
+      columns[index].colError = true
+    }
     columns[index].column = event.target.value
     setColumn([...columns])
   }
 
   const onChangeDataName = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    columns[index].dataName = event.target.value
+    // if (/^\S+$/.test(event.target.value)) {
+    //   columns[index].dataError = false
+    // }else {
+    //   columns[index].dataError = true
+    // }
+    columns[index].data = event.target.value
     setColumn([...columns])
   }
 
   const addColumn = () => {
-    const addItem = {column: "", dataName: "", colError: false, nameError:false}
+    const addItem = {column: "", data: "", colError: false, dataError:false}
     setColumn([...columns, addItem])
   }
 
@@ -72,15 +81,15 @@ const Home: NextPage = () => {
       [
         {
           column: "",
-          dataName: "",
+          data: "",
           colError: false,
-          nameError: false
+          dataError: false
         }
       ]
     )
     setSecond("\n  ([column])")
     setSecondItem([])
-    setThird("\nVALUES \n  (['data_name'])")
+    setThird("\nVALUES \n  (['data'])")
     setThirdItem([])
   }
 
@@ -88,9 +97,9 @@ const Home: NextPage = () => {
     let tmpSecond: string[] = []
     let tmpThird: string[] = []
     columns.map(item => {
-      if (item.column && !item.colError && item.dataName && !item.nameError) {
+      if (item.column && !item.colError /* && item.data && !item.dataError */) {
         tmpSecond.push(item.column)
-        tmpThird.push(item.dataName)
+        tmpThird.push(item.data)
       }
     })
     setSecondItem(tmpSecond)
@@ -101,7 +110,7 @@ const Home: NextPage = () => {
     let secondSql = "\n  ("
     let thirdSql = "\nVALUES\n  ("
 
-    if (secondItem.length > 0 && thirdItem.length > 0) {
+    if (secondItem.length > 0 /* && thirdItem.length > 0 */) {
       secondItem.map(item => {
         secondSql = secondSql + item + "\n  , "
       })
@@ -110,7 +119,7 @@ const Home: NextPage = () => {
       if (Number(addCount) > 1) {
         for (let i = 1; i <= Number(addCount); i++) {
           thirdItem.map(item => {
-            thirdSql = thirdSql + "'" + (item + "-" + i) + "', "
+            thirdSql = thirdSql + "'" + (item + i) + "', "
           })
           thirdSql = thirdSql.slice(0, -2) + ")\n  ,("
         }
@@ -123,14 +132,25 @@ const Home: NextPage = () => {
       }
     }else {
       secondSql = secondSql + "[column])"
-      thirdSql = thirdSql + "['data_name'])"
+      thirdSql = thirdSql + "['data'])"
     }
+
+    thirdSql = thirdSql.slice(0, -3) + ";"
 
     setSecond(secondSql)
     setThird(thirdSql)
 
   }, [addCount, secondItem, thirdItem])
 
+  const returnStyle = (index: number, tag: String) => {
+    switch (tag) {
+      case "col":
+        return columns[index].colError ? [bottomFormItemStyle, formItemError]: bottomFormItemStyle;
+      // case "data":
+      //   return columns[index].dataError ? [bottomFormItemStyle, formItemError]: bottomFormItemStyle;
+    }
+
+  }
   return (
     <div css={homeMount}>
       {/* <Head></Head> */}
@@ -156,7 +176,7 @@ const Home: NextPage = () => {
             </div>
             <div css={bottomFormItemLabel}>
               <p>カラム名</p>
-              <p>データ名</p>
+              <p>データ</p>
             </div>
             <div css={formScroll}>
               {
@@ -166,10 +186,10 @@ const Home: NextPage = () => {
                       <p>{index + 1}</p>
                       <div css={bottomFormItemInner}>
                         <div>
-                          <input type="text" value={item.column} onChange={e => onChangeColumn(e, index)} autoComplete="off" />
+                          <input type="text" value={item.column} onChange={e => onChangeColumn(e, index)} autoComplete="off" css={returnStyle(index, "col")}/>
                         </div>
                         <div>
-                          <input type="text" value={item.dataName} onChange={e => onChangeDataName(e, index)} autoComplete="off" />
+                          <input type="text" value={item.data} onChange={e => onChangeDataName(e, index)} autoComplete="off" css={bottomFormItemStyle}/>
                         </div>
                       </div>
                     </div>
@@ -280,12 +300,18 @@ const bottomFormItemInner = css`
   div {
     width: 50%;
     padding: 0 10px;
-    input {
-      width: 100%;
-      padding: 5px;
-      border: 2px solid #333333;
-    }
   }
+`
+
+const bottomFormItemStyle = css`
+  width: 100%;
+  padding: 5px;
+  border: 2px solid #333333;
+`
+
+const formItemError = css`
+  border-color: red;
+  background-color: #ffeeee;
 `
 
 const formStyle = css`
