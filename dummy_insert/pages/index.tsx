@@ -119,14 +119,22 @@ const Home: NextPage = () => {
       if (Number(addCount) > 1) {
         for (let i = 1; i <= Number(addCount); i++) {
           thirdItem.map(item => {
-            thirdSql = thirdSql + "'" + (item + i) + "', "
+            if (item.toUpperCase() != "NULL") {
+              thirdSql = thirdSql + "'" + (item + i) + "', "
+            } else {
+              thirdSql = thirdSql + "NULL" + ", "
+            }
           })
           thirdSql = thirdSql.slice(0, -2) + ")\n  ,("
         }
-        thirdSql = thirdSql.slice(0, -2)
+        thirdSql = thirdSql.slice(0, -5)
       } else {
         thirdItem.map(item => {
-          thirdSql = thirdSql + "'" + item + "'\n  , "
+          if (item.toUpperCase() != "NULL") {
+            thirdSql = thirdSql + "'" + item + "'\n  , "
+          } else {
+            thirdSql = thirdSql + "NULL" + "\n  , "
+          }
         })
         thirdSql = thirdSql.slice(0, -5) + ")"
       }
@@ -135,7 +143,7 @@ const Home: NextPage = () => {
       thirdSql = thirdSql + "['data'])"
     }
 
-    thirdSql = thirdSql.slice(0, -3) + ";"
+    thirdSql = thirdSql + ";"
 
     setSecond(secondSql)
     setThird(thirdSql)
