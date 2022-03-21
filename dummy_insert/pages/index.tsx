@@ -19,7 +19,6 @@ const Home: NextPage = () => {
       }
     ]
   )
-
   const [first, setFirst] = useState("INSERT \nINTO [table]")
   const [second, setSecond] = useState("\n  ([column])")
   const [secondItem, setSecondItem] = useState<string[]>([])
@@ -27,7 +26,9 @@ const Home: NextPage = () => {
   const [thirdItem, setThirdItem] = useState<string[]>([])
 
 
+  // テーブル名の設定
   const onChangeTableName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // 半角英数字、ハイフン、アンダースコア
     if (/^[0-9a-zA-Z-_]+$/.test(event.target.value)) {
       setTableError(false)
       setFirst("INSERT \nINTO " + event.target.value)
@@ -42,7 +43,9 @@ const Home: NextPage = () => {
     setTableName(event.target.value)
   }
 
+  // 追加レコード数の設定
   const onChangeAddCount = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // 半角数字のみ
     if (/^[0-9]+$/.test(event.target.value)) {
       setAddCountError(false)
     } else {
@@ -51,7 +54,9 @@ const Home: NextPage = () => {
     setAddCount(event.target.value)
   }
 
+  // カラム名の設定
   const onChangeColumn = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    // 半角英数字、ハイフン、アンダースコア
     if (/^[0-9a-zA-Z-_]+$/.test(event.target.value)) {
       columns[index].colError = false
     } else {
@@ -61,6 +66,7 @@ const Home: NextPage = () => {
     setColumn([...columns])
   }
 
+  // データの設定
   const onChangeDataName = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     // if (/^\S+$/.test(event.target.value)) {
     //   columns[index].dataError = false
@@ -71,11 +77,13 @@ const Home: NextPage = () => {
     setColumn([...columns])
   }
 
+  // カラムの追加
   const addColumn = () => {
     const addItem = {column: "", data: "", colError: false, dataError:false}
     setColumn([...columns, addItem])
   }
 
+  // カラムのフォームのリセット
   const resetAction = () => {
     setColumn(
       [
@@ -87,6 +95,29 @@ const Home: NextPage = () => {
         }
       ]
     )
+    setSecond("\n  ([column])")
+    setSecondItem([])
+    setThird("\nVALUES \n  (['data'])")
+    setThirdItem([])
+  }
+
+  // ページ全体のリセット
+  const allReset = () => {
+    setTableName("")
+    setTableError(false)
+    setAddCount("1")
+    setAddCountError(false)
+    setColumn(
+      [
+        {
+          column: "",
+          data: "",
+          colError: false,
+          dataError: false
+        }
+      ]
+    )
+    setFirst("INSERT \nINTO [table]")
     setSecond("\n  ([column])")
     setSecondItem([])
     setThird("\nVALUES \n  (['data'])")
@@ -164,6 +195,7 @@ const Home: NextPage = () => {
       {/* <Head></Head> */}
       <div css={container}>
         <div css={formArea}>
+        <button onClick={allReset}>全てをリセット</button>
           <div css={topFormArea}>
             <div css={topFormItem}>
               <label htmlFor='tableName'><span>テーブル名</span></label>
