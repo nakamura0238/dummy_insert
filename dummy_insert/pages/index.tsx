@@ -1,5 +1,4 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
 import { useState, useEffect } from 'react' 
 import { css } from '@emotion/react'
 
@@ -181,42 +180,41 @@ const Home: NextPage = () => {
 
   }, [addCount, secondItem, thirdItem])
 
-  const returnStyle = (index: number, tag: String) => {
-    switch (tag) {
-      case "col":
-        return columns[index].colError ? [bottomFormItemStyle, formItemError]: bottomFormItemStyle;
-      // case "data":
-      //   return columns[index].dataError ? [bottomFormItemStyle, formItemError]: bottomFormItemStyle;
-    }
-
+  const returnStyle = (flg: boolean) => {
+    // switch (tag) {
+    //   case "col":
+    //     return flg ? [formStyle, formItemError]: formStyle;
+    //   // case "data":
+    //   //   return columns[index].dataError ? [bottomFormItemStyle, formItemError]: bottomFormItemStyle;
+    // }
+    return flg ? [formStyle, formItemError]: formStyle;
   }
+
   return (
-    <div css={homeMount}>
-      {/* <Head></Head> */}
+    <>
+      <div>
+        <h1>ダミーINSERT</h1>
+      </div>
       <div css={container}>
         <div css={formArea}>
-        <button onClick={allReset}>全てをリセット</button>
+        {/* <button onClick={allReset}>全てをリセット</button> */}
           <div css={topFormArea}>
             <div css={topFormItem}>
               <label htmlFor='tableName'><span>テーブル名</span></label>
-              <input id='tableName' css={formStyle} type="text" value={tableName} onChange={onChangeTableName} autoComplete="off" />
+              <input id='tableName' css={returnStyle(tableError)} type="text" value={tableName} onChange={onChangeTableName} autoComplete="off" />
               <p css={errorMessage}>{tableError ? "半角英数字で入力してください" : ""}</p>
             </div>
             <div css={topFormItem}>
               <label htmlFor='addCount'><span>追加レコード数</span></label>
-              <input id='addCount' css={formStyle} type="number" min="1" value={addCount} onChange={onChangeAddCount} autoComplete="off"/>
+              <input id='addCount' css={returnStyle(addCountError)} type="number" min="1" value={addCount} onChange={onChangeAddCount} autoComplete="off"/>
               <p css={errorMessage}>{addCountError ? "半角数字で入力してください" : ""}</p>
             </div>
           </div>
 
           <div css={bottomFormArea}>
             <div css={buttonBox}>
-              <button onClick={addColumn}>カラム追加</button>
-              <button onClick={resetAction}>カラムリセット</button>
-            </div>
-            <div css={bottomFormItemLabel}>
-              <p>カラム名</p>
-              <p>データ</p>
+              <button css={addColumnButton} onClick={addColumn}>＋ カラム追加</button>
+              <button css={resetColumnButton} onClick={resetAction}>リセット</button>
             </div>
             <div css={formScroll}>
               {
@@ -226,10 +224,10 @@ const Home: NextPage = () => {
                       <p>{index + 1}</p>
                       <div css={bottomFormItemInner}>
                         <div>
-                          <input type="text" value={item.column} onChange={e => onChangeColumn(e, index)} autoComplete="off" css={returnStyle(index, "col")}/>
+                          <input type="text" value={item.column} onChange={e => onChangeColumn(e, index)} autoComplete="off" placeholder="カラム名" css={returnStyle(columns[index].colError)}/>
                         </div>
                         <div>
-                          <input type="text" value={item.data} onChange={e => onChangeDataName(e, index)} autoComplete="off" css={bottomFormItemStyle}/>
+                          <input type="text" value={item.data} onChange={e => onChangeDataName(e, index)} autoComplete="off" placeholder="データ" css={formStyle}/>
                         </div>
                       </div>
                     </div>
@@ -247,24 +245,17 @@ const Home: NextPage = () => {
           </textarea>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
 export default Home
 
-const homeMount = css`
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-`
-
 const container = css`
   display: flex;
   flex-direction: row;
   min-width: 640px;
-  min-height: 100vh;
-  padding: 50px 0;
+  padding-bottom: 30px;
 `
 
 const formArea = css`
@@ -292,33 +283,53 @@ const topFormItem = css`
 const bottomFormArea = css`
   display: flex;
   flex-direction: column;
+  border: 2px solid #dddddd;
+  border-radius: 5px;
 `
 
 const buttonBox = css`
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  width: 100%;
+  padding: 10px 20%;
+  border-bottom: 2px solid #dddddd;
+  /* margin-bottom: 20px;
   button {
     padding: 5px;
     border: 2px solid #333333;
+  } */
+`
+
+const addColumnButton = css`
+  padding: 5px 10px;
+  border: 2px solid #333333;
+  border-radius: 3px;
+  transition: 0.1s;
+  &:hover {
+    background-color: #333333;
+    color: #ffffff;
   }
 `
 
-const bottomFormItemLabel = css`
-  display: flex;
-  flex-direction: row;
-  margin-left: 50px;
-  p {
-    width: 50%;
-    text-align: center;
-    line-height: 1.6rem;
+const resetColumnButton = css`
+  padding: 5px 10px;
+  border: 2px solid #cc0000;
+  border-radius: 3px;
+  background-color: #ffffff;
+  color: #cc0000;
+  transition: 0.1s;
+  &:hover {
+    background-color: #cc0000;
+    color: #ffffff;
   }
 `
 
 const formScroll = css`
-  height: 600px;
+  height: 500px;
+  min-height: calc(1.5rem + 20px);
+  padding: 10px;
   overflow: auto;
+  resize: vertical;
 `
 
 const bottomFormItem = css`
@@ -343,22 +354,18 @@ const bottomFormItemInner = css`
   }
 `
 
-const bottomFormItemStyle = css`
-  width: 100%;
-  padding: 5px;
-  border: 2px solid #333333;
-`
-
 const formItemError = css`
   border-color: red;
   background-color: #ffeeee;
+  color: red;
 `
 
 const formStyle = css`
   display: block;
   width: 100%;
-  padding: 5px;
+  padding: 5px 10px;
   border: 2px solid #333333;
+  border-radius: 3px;
 `
 const errorMessage = css`
   height: 1.5rem;
@@ -370,13 +377,15 @@ const errorMessage = css`
 const exportArea = css`
   width: 40%;
   margin-left: 40px;
-  padding: 10px;
+  padding-top: 10px;
   resize: none;
   textarea {
     width: 100%;
-    min-height: 500px;
+    height: calc(100% - 1.8rem);
     padding: 10px;
-    border: 2px solid #666666;
+    border: 2px solid #333333;
+    border-radius: 5px;
+    font-family: 'Source Code Pro', monospace;
     line-height: 1.2rem;
     resize: vertical;
   }
