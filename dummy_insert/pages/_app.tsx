@@ -2,7 +2,7 @@ import '../styles/destyle.css'
 import '../styles/base.css'
 import type { AppProps } from 'next/app'
 import Head from "next/head"
-import { Layout } from './components/Layout'
+import Layout from './components/Layout'
 import { css } from '@emotion/react'
 
 function MyApp({ Component, pageProps }: AppProps) {
