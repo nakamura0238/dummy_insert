@@ -4,13 +4,11 @@ import { css } from "@emotion/react"
 import Header from "./header"
 import Footer from "./footer"
 
-
 type Props = {
   children: ReactNode;
 }
 
-
-export const Layout = ({ children }: Props) => {
+const Layout = ({ children }: Props) => {
 
   return (
     <>
@@ -22,6 +20,8 @@ export const Layout = ({ children }: Props) => {
     </>
   )
 }
+
+export default Layout
 
 const homeMount = css`
   display: flex;
