@@ -28,40 +28,40 @@ const Home: NextPage = () => {
   // テーブル名の設定
   const onChangeTableName = (event: React.ChangeEvent<HTMLInputElement>) => {
     // 半角英数字、ハイフン、アンダースコア
-    if (/^[0-9a-zA-Z-_]+$/.test(event.target.value)) {
+    if (/^[0-9a-zA-Z-_]+$/.test(event.currentTarget.value)) {
       setTableError(false)
-      setFirst("INSERT \nINTO " + event.target.value)
+      setFirst("INSERT \nINTO " + event.currentTarget.value)
     } else {
-      if (event.target.value) {
+      if (event.currentTarget.value) {
         setTableError(true)
       } else {
         setTableError(false)
         setFirst("INSERT \nINTO [table]")
       }
     }
-    setTableName(event.target.value)
+    setTableName(event.currentTarget.value)
   }
 
   // 追加レコード数の設定
   const onChangeAddCount = (event: React.ChangeEvent<HTMLInputElement>) => {
     // 半角数字のみ
-    if (/^[0-9]+$/.test(event.target.value)) {
+    if (/^[0-9]+$/.test(event.currentTarget.value)) {
       setAddCountError(false)
     } else {
       setAddCountError(true)
     }
-    setAddCount(event.target.value)
+    setAddCount(event.currentTarget.value)
   }
 
   // カラム名の設定
   const onChangeColumn = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     // 半角英数字、ハイフン、アンダースコア
-    if (/^[0-9a-zA-Z-_]+$/.test(event.target.value)) {
+    if (/^[0-9a-zA-Z-_]+$/.test(event.currentTarget.value)) {
       columns[index].colError = false
     } else {
       columns[index].colError = true
     }
-    columns[index].column = event.target.value
+    columns[index].column = event.currentTarget.value
     setColumn([...columns])
   }
 
@@ -72,7 +72,7 @@ const Home: NextPage = () => {
     // }else {
     //   columns[index].dataError = true
     // }
-    columns[index].data = event.target.value
+    columns[index].data = event.currentTarget.value
     setColumn([...columns])
   }
 
@@ -192,12 +192,14 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <div>
+      <div css={infoArea}>
         <h1>ダミーINSERT</h1>
+        <p>ダミーデータを挿入するためのSQL文を生成するサービスです。</p>
+        <p>複数レコード追加する場合には、データの後ろに番号が付与されます。</p>
+        <p>NULLはデータに「null」を入力することで設定できます。</p>
       </div>
       <div css={container}>
         <div css={formArea}>
-        {/* <button onClick={allReset}>全てをリセット</button> */}
           <div css={topFormArea}>
             <div css={topFormItem}>
               <label htmlFor='tableName'><span>テーブル名</span></label>
@@ -240,7 +242,7 @@ const Home: NextPage = () => {
 
         <div css={exportArea}>
           <label htmlFor='exportArea'><span css={css`display: inline-block; line-height: 1.8rem;`}>SQL文</span></label>
-          <textarea id='exportArea' css={css`width: 100%;`} readOnly value={first + second + third}>
+          <textarea id='exportArea' css={css`width: 100%;`} onClick={event => {event.currentTarget.select()}} value={first + second + third} readOnly>
             
           </textarea>
         </div>
@@ -254,8 +256,20 @@ export default Home
 const container = css`
   display: flex;
   flex-direction: row;
-  min-width: 640px;
+  min-width: 700px;
   padding-bottom: 30px;
+`
+
+const infoArea = css`
+  padding: 20px 0;
+  h1 {
+    padding-bottom: 20px;
+    font-size: 2.5rem;
+  }
+  p {
+    padding-left: 1rem;
+    line-height: 1.4rem;
+  }
 `
 
 const formArea = css`
@@ -326,7 +340,7 @@ const resetColumnButton = css`
 
 const formScroll = css`
   height: 500px;
-  min-height: calc(1.5rem + 20px);
+  min-height: calc(1.5rem + 35px);
   padding: 10px;
   overflow: auto;
   resize: vertical;
@@ -386,7 +400,7 @@ const exportArea = css`
     border: 2px solid #333333;
     border-radius: 5px;
     font-family: 'Source Code Pro', monospace;
-    line-height: 1.2rem;
+    line-height: 1.3rem;
     resize: vertical;
   }
 `

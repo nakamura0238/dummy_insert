@@ -1,6 +1,8 @@
 import { ReactNode } from 'react'
 // import Head from 'next/head'
 import { css } from "@emotion/react"
+import Header from "./header"
+import Footer from "./footer"
 
 
 type Props = {
@@ -11,16 +13,20 @@ type Props = {
 export const Layout = ({ children }: Props) => {
 
   return (
-    <div css={homeMount}>
-      {children}
-    </div>
+    <>
+      <Header></Header>
+      <div css={homeMount}>
+        {children}
+      </div>
+      <Footer></Footer>
+    </>
   )
 }
 
 const homeMount = css`
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   width: 90%;
   max-width: 1200px;
   margin: 0 auto;
